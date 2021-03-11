@@ -197,6 +197,12 @@ message SendUserMessage{
   string message = 2;
 }
 
+message UserCountMessage{
+  string count = 1;
+  string limit = 2;
+  string type = 2;
+}
+
 message BanUserMessage{
   string type = 1;
   string message = 2;
@@ -218,6 +224,7 @@ message ServerToClientMessage {
     SendUserMessage sendUserMessage = 12;
     BanUserMessage banUserMessage = 13;
     AdminRoomMessage adminRoomMessage = 14;
+    UserCountMessage userCountMessage = 15;
   }
 }
 

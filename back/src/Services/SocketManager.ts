@@ -298,20 +298,15 @@ export class SocketManager {
 
         const roomId = joinRoomMessage.getRoomid();
 
-        const world = await socketManager.getOrCreateRoom(roomId);
-
-        // Dispatch groups position to newly connected user
-        /*world.getGroups().forEach((group: Group) => {
-            this.emitCreateUpdateGroupEvent(socket, group);
-        });*/
+        const room = await socketManager.getOrCreateRoom(roomId);
 
         //join world
-        const user = world.join(socket, joinRoomMessage);
+        const user = room.join(socket, joinRoomMessage);
 
         clientEventsEmitter.emitClientJoin(user.uuid, roomId);
-        //console.log(new Date().toISOString() + ' A user joined (', this.sockets.size, ' connected users)');
+        this.dispatchUserCount(room);
         console.log(new Date().toISOString() + ' A user joined');
-        return {room: world, user};
+        return {room, user};
     }
 
     private onZoneEnter(thing: Movable, fromZone: Zone|null, listener: ZoneSocket) {
@@ -757,6 +752,17 @@ export class SocketManager {
 
             recipient.socket.write(clientMessage);
         });
+    }
+
+    private dispatchUserCount(room: GameRoom): void {
+        /*room.getUsers().forEach((recipient) => {
+            const sendUserMessage = new UserCountMessage();
+
+            const clientMessage = new ServerToClientMessage();
+            clientMessage.setSendusermessage(sendUserMessage);
+
+            recipient.socket.write(clientMessage);
+        });*/
     }
 }
 
