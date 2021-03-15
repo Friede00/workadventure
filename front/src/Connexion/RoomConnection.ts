@@ -43,7 +43,7 @@ import {
 } from "./ConnexionModels";
 import {BodyResourceDescriptionInterface} from "../Phaser/Entity/PlayerTextures";
 import {adminMessagesService} from "./AdminMessagesService";
-import {connectionManager, ConnexionMessageEventTypes} from "./ConnectionManager";
+import {connectionManager} from "./ConnectionManager";
 
 const manualPingDelay = 20000;
 
@@ -111,6 +111,8 @@ export class RoomConnection implements RoomConnection {
             const arrayBuffer: ArrayBuffer = messageEvent.data;
             const message = ServerToClientMessage.deserializeBinary(new Uint8Array(arrayBuffer));
 
+            connectionManager._serverToClientMessageStream.next(message);
+
             if (message.hasBatchmessage()) {
                 for (const subMessage of (message.getBatchmessage() as BatchMessage).getPayloadList()) {
                     let event: string;
@@ -156,8 +158,7 @@ export class RoomConnection implements RoomConnection {
                         items
                     } as RoomJoinedMessageInterface
                 });
-            } else if (message.hasErrormessage()) {
-                connectionManager._connexionMessageStream.next({type: ConnexionMessageEventTypes.worldFull}); //todo: generalize this behavior to all messages
+            } else if (message.hasWorldfullmessage()) {
                 this.closed = true;
             } else if (message.hasWebrtcsignaltoclientmessage()) {
                 this.dispatch(EventMessage.WEBRTC_SIGNAL, message.getWebrtcsignaltoclientmessage());
@@ -179,8 +180,6 @@ export class RoomConnection implements RoomConnection {
                 adminMessagesService.onSendusermessage(message.getSendusermessage() as SendUserMessage);
             } else if (message.hasBanusermessage()) {
                 adminMessagesService.onSendusermessage(message.getSendusermessage() as BanUserMessage);
-            } else {
-                throw new Error('Unknown message received');
             }
 
         }

@@ -197,10 +197,13 @@ message SendUserMessage{
   string message = 2;
 }
 
-message UserCountMessage{
-  string count = 1;
-  string limit = 2;
-  string type = 2;
+message WorldFullWarningMessage{
+}
+message WorldFullWarningToRoomMessage{
+    string roomId = 1;
+}
+
+message WorldFullMessage{
 }
 
 message BanUserMessage{
@@ -224,7 +227,8 @@ message ServerToClientMessage {
     SendUserMessage sendUserMessage = 12;
     BanUserMessage banUserMessage = 13;
     AdminRoomMessage adminRoomMessage = 14;
-    UserCountMessage userCountMessage = 15;
+    WorldFullWarningMessage worldFullWarningMessage = 15;
+    WorldFullMessage worldFullMessage = 16;
   }
 }
 
@@ -390,4 +394,5 @@ service RoomManager {
   rpc sendGlobalAdminMessage(AdminGlobalMessage) returns (EmptyMessage);
   rpc ban(BanMessage) returns (EmptyMessage);
   rpc sendAdminMessageToRoom(AdminRoomMessage) returns (EmptyMessage);
+  rpc sendWorldFullWarningToRoom(WorldFullWarningToRoomMessage) returns (EmptyMessage);
 }

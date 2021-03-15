@@ -24,6 +24,7 @@ import {
     UserJoinedZoneMessage,
     GroupUpdateZoneMessage,
     GroupLeftZoneMessage,
+    WorldFullWarningMessage,
     UserLeftZoneMessage,
     BanUserMessage,
 } from "../Messages/generated/messages_pb";
@@ -304,7 +305,6 @@ export class SocketManager {
         const user = room.join(socket, joinRoomMessage);
 
         clientEventsEmitter.emitClientJoin(user.uuid, roomId);
-        this.dispatchUserCount(room);
         console.log(new Date().toISOString() + ' A user joined');
         return {room, user};
     }
@@ -754,15 +754,22 @@ export class SocketManager {
         });
     }
 
-    private dispatchUserCount(room: GameRoom): void {
-        /*room.getUsers().forEach((recipient) => {
-            const sendUserMessage = new UserCountMessage();
+    dispatchWorlFullWarning(roomId: string,): void {
+        const room = this.rooms.get(roomId);
+        if (!room) {
+            //todo: this should cause the http call to return a 500
+            console.error("In sendAdminRoomMessage, could not find room with id '" +  roomId + "'. Maybe the room was closed a few milliseconds ago and there was a race condition?");
+            return;
+        }
+        
+        room.getUsers().forEach((recipient) => {
+            const worldFullMessage = new WorldFullWarningMessage();
 
             const clientMessage = new ServerToClientMessage();
-            clientMessage.setSendusermessage(sendUserMessage);
+            clientMessage.setWorldfullwarningmessage(worldFullMessage);
 
             recipient.socket.write(clientMessage);
-        });*/
+        });
     }
 }
 
